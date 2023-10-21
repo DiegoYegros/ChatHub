@@ -8,7 +8,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
     {
-        builder.WithOrigins("http://localhost:3000")
+        builder.WithOrigins("https://chathub.diegoyegros.com")
         .AllowCredentials()
         .AllowAnyHeader()
         .AllowAnyMethod();
