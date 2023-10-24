@@ -19,8 +19,11 @@ public class ChatHub : Hub
     {
         if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
         {
+            Message message1 = new Message();
+            message1.Content = message;
+            message1.Instant = DateTime.UtcNow.ToString("o");
             await Clients.Group(userConnection.Room)
-            .SendAsync("ReceiveMessage", userConnection.User + " " + DateTime.Now.ToString("HH:mm"), message);
+            .SendAsync("ReceiveMessage", userConnection.User, message1);
         }
     }
     public override async Task OnConnectedAsync()
@@ -35,10 +38,14 @@ public class ChatHub : Hub
     {
         if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
         {
+
+            Message message1 = new Message();
+            message1.Content = $"{userConnection.User} has left";
+            message1.Instant = DateTime.UtcNow.ToString("o");
             _connections.Remove(Context.ConnectionId);
             Groups.RemoveFromGroupAsync(Context.ConnectionId, LOBBY_GROUP_NAME);
             Clients.Group(userConnection.Room)
-            .SendAsync("ReceiveMessage", _botUser + " " + DateTime.Now.ToString("HH:mm"), $"{userConnection.User} has left");
+            .SendAsync("ReceiveMessage", _botUser, message1);
             SendConnectedUsers(userConnection.Room);
         }
         base.OnDisconnectedAsync(exception);
@@ -48,8 +55,11 @@ public class ChatHub : Hub
     {
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, LOBBY_GROUP_NAME);
         await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.Room);
+        Message message1 = new Message();
+        message1.Content = $"{userConnection.User} has joined";
+        message1.Instant = DateTime.UtcNow.ToString("o");
         _connections[Context.ConnectionId] = userConnection;
-        await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", _botUser + " " + DateTime.Now.ToString("HH:mm"), $"{userConnection.User} has joined");
+        await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", _botUser, message1);
         await SendConnectedUsers(userConnection.Room);
         await UpdateClientsInLobbyWithRoomList();
     }
