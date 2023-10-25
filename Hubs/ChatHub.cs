@@ -22,6 +22,7 @@ public class ChatHub : Hub
             Message message1 = new Message();
             message1.Content = message;
             message1.Instant = DateTime.UtcNow.ToString("o");
+            message1.ConnectionId = Context.ConnectionId;
             await Clients.Group(userConnection.Room)
             .SendAsync("ReceiveMessage", userConnection.User, message1);
         }
@@ -42,6 +43,7 @@ public class ChatHub : Hub
             Message message1 = new Message();
             message1.Content = $"{userConnection.User} has left";
             message1.Instant = DateTime.UtcNow.ToString("o");
+            message1.ConnectionId = Context.ConnectionId;
             _connections.Remove(Context.ConnectionId);
             Groups.RemoveFromGroupAsync(Context.ConnectionId, LOBBY_GROUP_NAME);
             Clients.Group(userConnection.Room)
@@ -58,6 +60,7 @@ public class ChatHub : Hub
         Message message1 = new Message();
         message1.Content = $"{userConnection.User} has joined";
         message1.Instant = DateTime.UtcNow.ToString("o");
+        message1.ConnectionId = Context.ConnectionId;
         _connections[Context.ConnectionId] = userConnection;
         await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", _botUser, message1);
         await SendConnectedUsers(userConnection.Room);
