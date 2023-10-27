@@ -15,14 +15,15 @@ public class ChatHub : Hub
         _connections = connections;
     }
 
-    public async Task SendMessage(string message)
+    public async Task SendMessage(Message message)
     {
         if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
         {
             Message message1 = new Message();
-            message1.Content = message;
+            message1.Content = message.Content;
             message1.Instant = DateTime.UtcNow.ToString("o");
             message1.ConnectionId = Context.ConnectionId;
+            message1.ImageData = message.ImageData;
             await Clients.Group(userConnection.Room)
             .SendAsync("ReceiveMessage", userConnection.User, message1);
         }
