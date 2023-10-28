@@ -2,13 +2,16 @@ using ChatService;
 using ChatService.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    options.MaximumReceiveMessageSize = 10 * 1024 * 1024; // 10MB
+});
 builder.Services.AddSingleton<IDictionary<string, UserConnection>>(options => new Dictionary<string, UserConnection>());
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
     {
-        builder.WithOrigins("https://chathub.diegoyegros.com")
+        builder.WithOrigins("http://localhost:3000")
         .AllowCredentials()
         .AllowAnyHeader()
         .AllowAnyMethod();
