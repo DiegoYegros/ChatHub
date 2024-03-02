@@ -17,7 +17,7 @@ public class ChatHub : Hub
 
     public async Task SendMessage(Message message)
     {
-        if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
+        if (_connections.TryGetValue(Context.ConnectionId, out UserConnection? userConnection))
         {
             Message message1 = new Message();
             message1.Content = message.Content;
@@ -36,9 +36,9 @@ public class ChatHub : Hub
         await Clients.Group(LOBBY_GROUP_NAME).SendAsync("RoomsAndAmountOfPeople", rooms);
     }
 
-    public override Task OnDisconnectedAsync(Exception exception)
+    public override Task OnDisconnectedAsync(Exception? exception)
     {
-        if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
+        if (_connections.TryGetValue(Context.ConnectionId, out UserConnection? userConnection))
         {
 
             Message message1 = new Message();
