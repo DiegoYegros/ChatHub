@@ -37,6 +37,7 @@ msbuild.wrn
 .vs/
 
 # more
+/bin/*
 *.cache
 *.dll
 *.exe
