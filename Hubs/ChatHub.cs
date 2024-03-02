@@ -17,15 +17,12 @@ public class ChatHub : Hub
 
     public async Task SendMessage(Message message)
     {
-        if (_connections.TryGetValue(Context.ConnectionId, out UserConnection? userConnection))
+        if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
         {
-            Message message1 = new Message();
-            message1.Content = message.Content;
-            message1.Instant = DateTime.UtcNow.ToString("o");
-            message1.ConnectionId = Context.ConnectionId;
-            message1.ImageData = message.ImageData;
+            Message msg = buildMessage(message.Content);
+            msg.ImageData = message.ImageData;
             await Clients.Group(userConnection.Room)
-            .SendAsync("ReceiveMessage", userConnection.User, message1);
+            .SendAsync("ReceiveMessage", userConnection.User, msg);
         }
     }
     public override async Task OnConnectedAsync()
@@ -36,19 +33,15 @@ public class ChatHub : Hub
         await Clients.Group(LOBBY_GROUP_NAME).SendAsync("RoomsAndAmountOfPeople", rooms);
     }
 
-    public override Task OnDisconnectedAsync(Exception? exception)
+    public override Task OnDisconnectedAsync(Exception exception)
     {
-        if (_connections.TryGetValue(Context.ConnectionId, out UserConnection? userConnection))
+        if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
         {
-
-            Message message1 = new Message();
-            message1.Content = $"{userConnection.User} has left";
-            message1.Instant = DateTime.UtcNow.ToString("o");
-            message1.ConnectionId = Context.ConnectionId;
+            Message msg = buildMessage($"{userConnection.User} has left");
             _connections.Remove(Context.ConnectionId);
             Groups.RemoveFromGroupAsync(Context.ConnectionId, LOBBY_GROUP_NAME);
             Clients.Group(userConnection.Room)
-            .SendAsync("ReceiveMessage", _botUser, message1);
+            .SendAsync("ReceiveMessage", _botUser, msg);
             SendConnectedUsers(userConnection.Room);
         }
         base.OnDisconnectedAsync(exception);
@@ -58,15 +51,15 @@ public class ChatHub : Hub
     {
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, LOBBY_GROUP_NAME);
         await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.Room);
-        Message message1 = new Message();
-        message1.Content = $"{userConnection.User} has joined";
-        message1.Instant = DateTime.UtcNow.ToString("o");
-        message1.ConnectionId = Context.ConnectionId;
+        Message msg = buildMessage($"{userConnection.User} has joined");
         _connections[Context.ConnectionId] = userConnection;
-        await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", _botUser, message1);
+        await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", _botUser, msg);
         await SendConnectedUsers(userConnection.Room);
         await UpdateClientsInLobbyWithRoomList();
     }
+
+
+
     public async Task UpdateClientsInLobbyWithRoomList()
     {
         var rooms = _connections.Values.GroupBy(c => c.Room).ToList();
@@ -79,5 +72,13 @@ public class ChatHub : Hub
         .Select(c => c.User);
         return Clients.Group(room).SendAsync("UsersInRoom", users);
     }
-
+    private Message buildMessage(string content)
+    {
+        return new Message
+        {
+            Content = content,
+            Instant = DateTime.UtcNow.ToString("o"),
+            ConnectionId = Context.ConnectionId
+        };
+    }
 }

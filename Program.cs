@@ -12,14 +12,14 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(builder =>
     {
         builder.WithOrigins("https://chathub.diegoyegros.com")
-        .AllowCredentials()
+                .AllowCredentials()
         .AllowAnyHeader()
         .AllowAnyMethod();
     });
 });
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/", () => "yeah, its working, now go to /chat");
 app.MapHub<ChatHub>("/chat");
 app.UseCors();
 app.Run();
