@@ -1,7 +1,10 @@
+using ChatService.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ChatService.Hubs;
 
+[Authorize]
 public class ChatHub : Hub
 {
     private readonly string _botUser;
