@@ -3,8 +3,10 @@ using ChatService;
 using ChatService.Data;
 using ChatService.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,8 +31,22 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
+builder.Services.AddHealthChecks();
+builder.Services.AddControllers();
 
+// Swagger UI
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "ChatHub",
+        Description = "Let the messages flow."
+    });
 
+    options.AddSignalRSwaggerGen();
+});
 // JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -52,8 +68,22 @@ app.UseRouting();
 
 app.UseCors();
 
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseHealthChecks("/health");
+
 app.MapHub<ChatHub>("/chat");
 
-app.MapGet("/", () => "yeah, its working, now go to /chat");
+app.MapGet("/", () => "ChatHub. Where everything is happening.");
 
 app.Run();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "ChatHub API v1");
+    });
+}

@@ -1,10 +1,12 @@
 using ChatService.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using SignalRSwaggerGen.Attributes;
 
 namespace ChatService.Hubs;
 
 [Authorize]
+[SignalRHub]
 public class ChatHub : Hub
 {
     private readonly string _botUser;
@@ -20,7 +22,7 @@ public class ChatHub : Hub
 
     public async Task SendMessage(Message message)
     {
-        if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
+        if (_connections.TryGetValue(Context.ConnectionId, out UserConnection? userConnection))
         {
             Message msg = buildMessage(message.Content);
             msg.ImageData = message.ImageData;
@@ -36,9 +38,9 @@ public class ChatHub : Hub
         await Clients.Group(LOBBY_GROUP_NAME).SendAsync("RoomsAndAmountOfPeople", rooms);
     }
 
-    public override Task OnDisconnectedAsync(Exception exception)
+    public override Task OnDisconnectedAsync(Exception? exception)
     {
-        if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
+        if (_connections.TryGetValue(Context.ConnectionId, out UserConnection? userConnection))
         {
             Message msg = buildMessage($"{userConnection.User} has left");
             _connections.Remove(Context.ConnectionId);
@@ -75,7 +77,7 @@ public class ChatHub : Hub
         .Select(c => c.User);
         return Clients.Group(room).SendAsync("UsersInRoom", users);
     }
-    private Message buildMessage(string content)
+    private Message buildMessage(string? content)
     {
         return new Message
         {

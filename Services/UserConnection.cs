@@ -1,6 +1,6 @@
 namespace ChatService;
 public class UserConnection
 {
-    public string User { get; set; }
-    public string Room { get; set; }
+    public required string User { get; set; }
+    public required string Room { get; set; }
 }
