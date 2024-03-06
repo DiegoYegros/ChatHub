@@ -1,9 +1,8 @@
 using System.Text;
-using ChatService;
-using ChatService.Data;
-using ChatService.Hubs;
+using ChatHub.Data;
+using ChatHub.Hubs;
+using ChatHub.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -73,7 +72,7 @@ app.UseSwaggerUI();
 
 app.UseHealthChecks("/health");
 
-app.MapHub<ChatHub>("/chat");
+app.MapHub<Hubs>("/chat");
 
 app.MapGet("/", () => "ChatHub. Where everything is happening.");
 

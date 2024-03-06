@@ -1,7 +1,7 @@
 // YourDbContext.cs
 using Microsoft.EntityFrameworkCore;
-using ChatService.Models;
-namespace ChatService.Data
+using ChatHub.Models;
+namespace ChatHub.Data
 {
     public class SqlServerDbContext : DbContext
     {

@@ -1,4 +1,4 @@
-namespace ChatService;
+namespace ChatHub.Services;
 public class UserConnection
 {
     public required string User { get; set; }

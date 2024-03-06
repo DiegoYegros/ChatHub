@@ -1,20 +1,21 @@
-using ChatService.Models;
+using ChatHub.Models;
+using ChatHub.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using SignalRSwaggerGen.Attributes;
 
-namespace ChatService.Hubs;
+namespace ChatHub.Hubs;
 
 [Authorize]
 [SignalRHub]
-public class ChatHub : Hub
+public class Hubs : Hub
 {
     private readonly string _botUser;
     private readonly IDictionary<string, UserConnection> _connections;
 
     private const string LOBBY_GROUP_NAME = "LobbyGroup";
 
-    public ChatHub(IDictionary<string, UserConnection> connections)
+    public Hubs(IDictionary<string, UserConnection> connections)
     {
         _botUser = "Almighty";
         _connections = connections;
