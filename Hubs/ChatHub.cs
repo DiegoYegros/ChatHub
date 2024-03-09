@@ -62,8 +62,17 @@ public class ChatHub : Hub
 
     public async Task UpdateClientsInLobbyWithRoomList()
     {
-        var rooms = _connections.Values.GroupBy(c => c.Room).ToList();
-        await Clients.Group(LOBBY_GROUP_NAME).SendAsync("RoomsAndAmountOfPeople", rooms);
+        var rooms = _connections.Values
+       .GroupBy(c => c.Room)
+       .Select(g => new Room
+       {
+           Id = Guid.NewGuid().ToString(),
+           Name = g.Key,
+           ConnectedUsers = g.Count()
+       })
+       .ToList();
+        await Clients.Group(LOBBY_GROUP_NAME)
+                     .SendAsync("RoomsAndAmountOfPeople", rooms);
     }
     public Task SendConnectedUsers(string room)
     {
